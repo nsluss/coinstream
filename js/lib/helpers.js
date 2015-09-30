@@ -9,7 +9,7 @@ var utilities = {
     console.log(x);
     return x;
   }
-  //standardize :: Srting url, {} a, {} b => url -> (a -> b)
+
   , standardize (src) {
     if (src === __.coinbaseWsFeed) {
       return (x) => {
@@ -46,7 +46,7 @@ var utilities = {
     }
     return state;
   }
-  //observeSocket :: Observable o, Ws w  => Url -> JSON -> o w (Url)
+
   , observeSocket (url, open) {
     function socket () {
       var sock = new WebSocket(url)
@@ -58,8 +58,6 @@ var utilities = {
   var src = Rx.Observable
      .fromEvent(socket(), 'message')
      .map(e => JSON.parse(e.data))
-     //.debounce('20')
-
    return src;
  }
 }
