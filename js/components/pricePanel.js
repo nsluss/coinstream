@@ -1,55 +1,75 @@
-var React      = require('react')
-  , PriceEntry = require('./priceEntry.js')
-  , _          = require('ramda')
-  , Rx         = require('rx')
-  , $          = require('../lib/helpers.js')
-  , __         = require('../lib/constants.js')
+var React     = require('react')
+  , OrderList = require('./orderList.js')
+  , _         = require('ramda')
+  , Rx        = require('rx')
+  , $         = require('../lib/helpers.js')
+  , __        = require('../lib/constants.js')
 
 var Panel = React.createClass({
   getInitialState () {
-    return __.empty
+    return {
+        side: this.props.filter.side
+      , orders: {
+        size: 0
+      }
+    }
   }
   //impure
-  , setPrice (x) {
-    this.setState(x)
-  }
   , orderPrices (x) {
     //order is correct and price exists
-    if (this.state.index < x.index && !!x.price) {
-      this.setPrice(x);
-    }
+    //if (this.state.index < x.index && !!x.price) {
+      
+      this.setState($.log({orders: this.updateOrders(x)}));
+    //}
   }
   //impure
   , transform () {
     $.observeSocket(this.props.src, this.props.sub)
+        //.throttle(100) //for testing
         .map($.standardize(this.props.src))
         .filter(_.whereEq(this.props.filter))
-        .do($.log)
+        //.do($.log)
         .subscribe((x) => {this.orderPrices(x)}, $.log, $.log);
   }
+  //pseudo-pure
+  , updateOrders (open) {
+    var orders = this.state.orders.size
+    if (open.type === 'done') {
+      return _.merge({}, _.dissoc(open.id, this.state.orders))//, {size: orders - 1})
+    } else if (open.type === 'open'){
+      // return {
+      //     orders: _.merge(this.state.orders
+      //                   , entry)
+      // }
+      return _.merge({}, _.assoc(open.id, open, this.state.orders))//, {size: orders + 1})
+    } else if (open.type === 'change') {
+      return _.merge(this.state.orders, open)
+    } else {
+      return this.state.orders
+    }
+  }
+
   //impure
   , componentWillMount () {
     this.setState({side: this.props.filter.side})
     this.transform();
     //console.log($);
-    $.log(this.props.filter)
   }
 
   , render () {
     return (
       <div className='panel'>
         <h2>{this.props.children}</h2>
-        <p className="price">Price: {this.state.price}</p>
-        <input 
-          className={this.props.type==="info"?"hidden":"goButton"}
-          type="button" 
-          value="Take Order"
-          onClick={_ => this.props.handleClick(this.state)} />
-        <PriceEntry>test</PriceEntry>
+        <h3>Open Orders: {this.state.orders.size}</h3>
+        <OrderList list={this.state.orders}></OrderList>
       </div>
       )
   }
-
+// <input 
+        //   className={this.props.type==="info"?"hidden":"goButton"}
+        //   type="button" 
+        //   value="Take Order"
+        //   onClick={_ => this.props.handleClick(this.state)} />
 
 })
 

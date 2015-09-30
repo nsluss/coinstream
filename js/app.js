@@ -33,7 +33,7 @@ var App = React.createClass({
         <Panel
           src={__.coinbaseWsFeed}
           sub={__.BTC_USDSub}
-          filter={_.merge(__.sell, __.open)}
+          filter={__.sell}
           type="active" 
           handleClick={this.orderHandler} >
             Coinbase last open sell order
@@ -41,7 +41,7 @@ var App = React.createClass({
         <Panel
           src={__.coinbaseWsFeed}
           sub={__.BTC_USDSub}
-          filter={_.merge(__.buy, __.open)}
+          filter={__.buy}
           type="active"
           handleClick={this.orderHandler} >
             Coinbase last open buy order

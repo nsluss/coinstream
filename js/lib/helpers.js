@@ -1,6 +1,8 @@
-var Rx = require('rx')
-  , __ = require('./constants.js')
-  , _  = require('ramda')
+var priceEntry = require('../components/priceEntry.js')
+  , React      = require('react')
+  , __         = require('./constants.js')
+  , Rx         = require('rx')
+  , _          = require('ramda')
 
 var utilities = {
   log (x) {
@@ -15,7 +17,7 @@ var utilities = {
           type:  x.type
         , price: x.price
         , side:  x.side
-        , size:  x.size || x.remaining_size
+        , size:  x.size || x.remaining_size || new_size
         , time:  x.time
         , index: x.sequence
         , id:    x.order_id
@@ -23,6 +25,11 @@ var utilities = {
       }
     }
   }
+
+  , compPrice (a, b) {
+    return a.price > b.price
+  }
+  , makeEntry () {}
 
   , diffStateStats (state, order) {
     order.size = order.size || 1
